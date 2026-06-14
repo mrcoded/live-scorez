@@ -1,0 +1,17 @@
+# AI Agent Configuration & Project Rules
+
+This document outlines workspace-specific rules, skills, and behaviors that AI assistants should follow when working on the **live-scorez** repository.
+
+## Branch Naming and Git Workflow
+- When setting up new functionalities (features), **always** ensure to create a new branch.
+- Use the prefix `feat/` followed by the name of the feature: `feat/(name of feature)`.
+  - *Example*: For setting up the database/ORM, use `feat/database-orm-setup`.
+- For bug fixes, use `fix/(description)`.
+- For other tasks, use `chore/` or `refactor/`.
+- Ensure all PRs follow the structure defined in [pull_request.md](file:///c:/Users/coded/Desktop/live-scorez/pull_request.md).
+
+## Technology Stack & Best Practices
+- **Language**: TypeScript
+- **Framework**: ExpressJS
+- **Database**: Neon (PostgreSQL)
+- **ORM**: Drizzle ORM
