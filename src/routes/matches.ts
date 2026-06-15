@@ -48,7 +48,6 @@ matchRouter.post("/", async (req: Request, res: Response) => {
 
     const { startTime, endTime, homeScore, awayScore } = parsed.data;
 
-
     try {
         const [event] = await db.insert(matches).values({
             ...parsed.data,
@@ -59,7 +58,12 @@ matchRouter.post("/", async (req: Request, res: Response) => {
             status: getMatchStatus(startTime, endTime) ?? MATCH_STATUS.SCHEDULED
         }).returning();
 
-        res.status(201).json({
+        // BroadCast the event using websocket
+        if (res.app.locals.broadcastMatchCreated) {
+            res.app.locals.broadcastMatchCreated(event);
+        }
+
+        return res.status(201).json({
             success: true,
             event
         })
