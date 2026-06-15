@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { matchRouter } from './routes/matches';
 
 const app = express();
 const PORT = 8000;
@@ -6,10 +7,13 @@ const PORT = 8000;
 // Use JSON middleware to parse incoming JSON request bodies
 app.use(express.json());
 
+
 // Root GET route
-app.get('/', (req: Request, res: Response) => {
+app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the live-scorez API!' });
 });
+
+app.use("/api/matches", matchRouter)
 
 // Start server
 app.listen(PORT, () => {
