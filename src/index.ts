@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 
 import { matchRouter } from './routes/matches';
 import { attachWebSocketServer } from './websocket/server';
+import { securityMiddleware } from './config/arcjet';
 
 const PORT = Number(process.env.PORT || 8000);
 const HOST = process.env.HOST || "0.0.0.0";
@@ -19,6 +20,9 @@ app.use(express.json());
 app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the live-scorez API!' });
 });
+
+// apply security middleware on all the routes
+app.use(securityMiddleware())
 
 app.use("/api/matches", matchRouter)
 
