@@ -16,7 +16,7 @@ matchRouter.get("/", async (req: Request, res: Response) => {
 
     // Validation check
     if (!parsed.success) {
-        return res.status(400).json({ error: "Invalid query", details: JSON.stringify(parsed.error) });
+        return res.status(400).json({ error: "Invalid query", details: parsed.error.issues });
     }
 
     const limit = Math.min(parsed.data.limit ?? 50, MAX_LIMIT)
@@ -43,11 +43,10 @@ matchRouter.post("/", async (req: Request, res: Response) => {
 
     // Validation check
     if (!parsed.success) {
-        return res.status(400).json({ error: "Invalid payload", details: JSON.stringify(parsed.error) });
+        return res.status(400).json({ error: "Invalid payload", details: parsed.error.issues });
     }
 
     const { startTime, endTime, homeScore, awayScore } = parsed.data;
-
 
     try {
         const [event] = await db.insert(matches).values({
@@ -59,7 +58,12 @@ matchRouter.post("/", async (req: Request, res: Response) => {
             status: getMatchStatus(startTime, endTime) ?? MATCH_STATUS.SCHEDULED
         }).returning();
 
-        res.status(201).json({
+        // BroadCast the event using websocket
+        if (res.app.locals.broadcastMatchCreated) {
+            res.app.locals.broadcastMatchCreated(event);
+        }
+
+        return res.status(201).json({
             success: true,
             event
         })

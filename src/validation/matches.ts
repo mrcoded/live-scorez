@@ -8,10 +8,7 @@ export const MATCH_STATUS = {
 } as const;
 
 // Helper function to validate ISO 8601 date string format
-const isISOString = (val: string) => {
-  const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/;
-  return isoRegex.test(val) && !isNaN(Date.parse(val));
-};
+const isISOString = z.iso.datetime()
 
 // Schema for listing matches with an optional limit (coerced positive integer <= 100)
 export const listMatchesQuerySchema = z.object({
@@ -28,12 +25,8 @@ export const createMatchSchema = z.object({
   sport: z.string().min(1, 'Sport is required'),
   homeTeam: z.string().min(1, 'Home team is required'),
   awayTeam: z.string().min(1, 'Away team is required'),
-  startTime: z.string().refine(isISOString, {
-    message: 'startTime must be a valid ISO date string',
-  }),
-  endTime: z.string().refine(isISOString, {
-    message: 'endTime must be a valid ISO date string',
-  }),
+  startTime: z.iso.datetime(),
+  endTime: z.iso.datetime(),
   homeScore: z.coerce.number().int().nonnegative().optional(),
   awayScore: z.coerce.number().int().nonnegative().optional(),
 }).superRefine((data, ctx) => {
