@@ -3,6 +3,9 @@ import WebSocket, { WebSocketServer } from "ws";
 
 import { Match } from "@/types";
 import { WSMessage } from "@/types/ws";
+import { wsArcjet } from "@/config/arcjet";
+
+
 
 interface ExtendedWebSocket extends WebSocket {
     isAlive?: boolean;
@@ -31,11 +34,47 @@ function broadcast(wss: WebSocketServer, payload: WSMessage): void {
 
 // attach websocket server to http server
 export function attachWebSocketServer(server: Server) {
-    const wss = new WebSocketServer({ server, path: "/ws", maxPayload: 1024 ^ 1024 })
+    const wss = new WebSocketServer({ noServer: true, path: '/ws', maxPayload: 1024 * 1024 })
+
+
+    server.on("upgrade", async (req, socket, head) => {
+        const { pathname } = new URL(req.url || "", `http://${req.headers.host}`);
+
+        if (pathname !== "/ws") {
+            socket.destroy();
+            return;
+        }
+
+        if (wsArcjet) {
+            try {
+                const decision = await wsArcjet.protect(req);
+
+                if (decision.isDenied()) {
+                    if (decision.reason.isRateLimit()) {
+                        socket.write("HTTP/1.1 429 Too Many Requests\r\nConnection: close\r\nContent-Type: text/plain\r\n\r\nToo Many Requests\r\n");
+                    } else {
+                        socket.write("HTTP/1.1 403 Forbidden\r\nConnection: close\r\nContent-Type: text/plain\r\n\r\nForbidden\r\n");
+                    }
+                    socket.destroy();
+                    return;
+                }
+            } catch (error) {
+                console.error("WS upgrade middleware error", error);
+                socket.write("HTTP/1.1 500 Internal Server Error\r\nConnection: close\r\nContent-Type: text/plain\r\n\r\nInternal Server Error\r\n");
+                socket.destroy();
+                return;
+            }
+        }
+
+        wss.handleUpgrade(req, socket, head, (ws) => {
+            wss.emit("connection", ws, req);
+        });
+    });
 
     // on new connection
-    wss.on("connection", (socket) => {
+    wss.on("connection", (socket, req) => {
         const ws = socket as ExtendedWebSocket;
+
         ws.isAlive = true;
         ws.on('pong', () => { ws.isAlive = true });
 
