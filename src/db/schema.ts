@@ -23,7 +23,7 @@ export const commentary = pgTable('commentary', {
   matchId: integer('match_id')
     .references(() => matches.id, { onDelete: 'cascade' })
     .notNull(),
-  minute: integer('minute').notNull(),
+  minutes: integer('minute').notNull(),
   sequence: integer('sequence').notNull(),
   period: text('period').notNull(),
   eventType: text('event_type').notNull(),
