@@ -4,6 +4,7 @@ import express, { Request, Response } from 'express';
 import { matchRouter } from './routes/matches';
 import { attachWebSocketServer } from './websocket/server';
 import { securityMiddleware } from './config/arcjet';
+import { commentaryRouter } from './routes/commentary';
 
 const PORT = Number(process.env.PORT || 8000);
 const HOST = process.env.HOST || "0.0.0.0";
@@ -25,10 +26,12 @@ app.get('/api', (req: Request, res: Response) => {
 app.use(securityMiddleware())
 
 app.use("/api/matches", matchRouter)
+app.use("/api/matches/:id/commentary", commentaryRouter)
 
 // attach websocket server
-const { broadcastMatchCreated } = attachWebSocketServer(server)
+const { broadcastMatchCreated, broadcastCommentary } = attachWebSocketServer(server)
 app.locals.broadcastMatchCreated = broadcastMatchCreated
+app.locals.broadcastCommentary = broadcastCommentary
 
 // Start server
 server.listen(PORT, HOST, () => {
