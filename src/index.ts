@@ -1,3 +1,6 @@
+import AgentAPI from 'apminsight';
+AgentAPI.config()
+
 import http from 'http'
 import express, { Request, Response } from 'express';
 
@@ -20,6 +23,11 @@ app.use(express.json());
 // Root GET route
 app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the live-scorez API!' });
+});
+
+// Health check GET route
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // apply security middleware on all the routes
