@@ -488,7 +488,7 @@ async function seed(): Promise<void> {
             if (Number.isInteger(seedMatch.id)) {
                 matchMap.set(seedMatch.id as number, {
                     match,
-                    score: { home: match.homeScore ?? 0, away: match.awayScore ?? 0 },
+                    score: { home: match?.homeScore ?? 0, away: match?.awayScore ?? 0 },
                     fakeNext: Math.random() < 0.5 ? "home" : "away",
                 });
             }
