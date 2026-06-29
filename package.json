@@ -19,7 +19,9 @@
   "dependencies": {
     "@arcjet/inspect": "^1.5.0",
     "@arcjet/node": "^1.5.0",
+    "@types/cors": "^2.8.19",
     "apminsight": "^5.4.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
@@ -32,6 +34,7 @@
     "@types/node": "^25.9.3",
     "@types/pg": "^8.20.0",
     "@types/ws": "^8.18.1",
+    "consola": "^3.4.2",
     "drizzle-kit": "^0.31.10",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
